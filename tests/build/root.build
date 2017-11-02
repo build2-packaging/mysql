@@ -1,0 +1,21 @@
+# file      : tests/build/root.build
+# copyright : Copyright (c) 2016-2017 Code Synthesis Ltd
+# license   : GPLv2 with FOSS License Exception; see accompanying COPYING file
+
+# It would be good to make sure that libmysqlclient headers comply with an
+# oldest C standard, but that's not the case (C++-style comments are used).
+#
+c.std = 99
+
+using c
+
+h{*}: extension = h
+c{*}: extension = c
+
+# Every exe{} in this subproject is by default a test.
+#
+exe{*}: test = true
+
+# Specify the test target for cross-testing.
+#
+test.target = $c.target

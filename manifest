@@ -1,0 +1,20 @@
+: 1
+name: libmysqlclient
+
+# Note: remember to update doc-url below!
+#
+version: 5.7.20-a.0.z
+
+summary: MySQL C API client library
+license: GPLv2 with FOSS License Exception
+tags: mysql, database, client, connector, library, c, api, interface
+description-file: README
+url: https://www.mysql.com
+doc-url: https://dev.mysql.com/doc/refman/5.7/en/c-api.html
+src-url: https://git.build2.org/cgit/packaging/mysql/libmysqlclient/tree/
+package-url: https://git.build2.org/cgit/packaging/mysql/
+email: mysql@lists.mysql.com; Mailing list.
+package-email: packaging@build2.org; Mailing list.
+build-email: builds@build2.org
+depends: * build2 >= 0.7.0-
+depends: * bpkg >= 0.7.0-

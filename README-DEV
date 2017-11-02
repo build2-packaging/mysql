@@ -1,0 +1,153 @@
+This document describes how libmysqlclient was packaged for build2. In
+particular, this understanding will be useful when upgrading to a new upstream
+version.
+
+The original libmysqlclient library is packaged together with other libraries,
+the MySQL server, and client utilities. The library source files are spread
+across several top-level subdirectories. These subdirectories also contain the
+library-irrelevant files (which we skip) along with examples and tests. The
+reasonable approach for defining the required source files is to exclude
+everything you have doubts about and rely on the linker reporting unresolved
+symbols. We balance between keeping the upstream package directory structure
+and making sure that the library can be properly imported into a build2
+projects. Below are the packaging steps in more detail.
+
+1.  Copy include/mysql_version.h.in to mysql/version.h.in, and create
+    mysql/mysql_version.h that includes <mysql/version.h>.
+
+2.  Copy config.h.cmake to mysql/config.h.cmake.orig, and use it for creating
+    mysql/my_config.h manually, defining/undefining only those macros that are
+    used in the library source code (see below). Also create mysql/config.h
+    that just includes <mysql/my_config.h>.
+
+    Note that some macro values can not be easily determined at the
+    preprocessing time. We define them based on the supported platform tests
+    and add mysql/libmysql/assert.c, containing compile-time assertions for
+    the macros in question.
+
+    Also note that some of the macro values depend on the project
+    configuration. We add such macro definitions into the mysql/version.h.in
+    and include <mysql/version.h> into mysql/my_config.h. We could place them
+    into a separate header template file, but probably there is already enough
+    config and version headers.
+
+3.  Copy libbinlogevents/export/binary_log_types.h to mysql/.
+
+4.  Part of the upstream package library headers are located under the include/
+    subdirectory. We will copy it recursively to mysql/, but only those headers
+    that are required by the library source code. We start from an empty mysql/
+    and add the headers that can't be found by the preprocessor. Note that you
+    need to be careful not to pickup system-installed headers (see below).
+
+5.  Recursively copy source files from zlib/, strings/, mysys/, mysys_ssl/,
+    extra/yassl/, vio/, sql/, sql-common/ and libmysql/ to mysql/, preserving
+    the original directory structure, except files not required for the library
+    compilation/linkage (see above). Rename .cc files to .cpp afterwards, using
+    the following command (upstream uses a mixture of extensions which we just
+    not going to bother handling):
+
+    $ for f in `find . -name '*.cc'`; do mv "$f" "${f%.cc}.cpp"; done
+
+    Copy the READMEs and licenses for the bundled libraries as well.
+
+6.  Copy client/get_password.c to mysql/extra/yassl/src/.
+
+7.  Copy upstream package compile-time auto-generated include/mysqld_error.h
+    to mysql/. It is generated from sql/share/errmsg-utf8.txt by the pre-built
+    comp_err utility. The utility also produces some other headers (which we
+    don't use) and localized errmsg.sys files that are not installed with the
+    library. Could we not copy it from a binary or distribution or from
+    Debian/Fedora package?
+
+8.  Create mysql/libmysql/libmysql_exports_win32.def to contain a list of the
+    exported names. For that purpose grep through libmysql/CMakeLists.txt to
+    see how the .def file is generated for Windows. The corresponding code
+    normally looks like:
+
+    MERGE_LIBRARIES(libmysql SHARED ${LIBS}
+      EXPORTS ${CLIENT_API_FUNCTIONS} ${CLIENT_API_FUNCTIONS_UNDOCUMENTED}
+      COMPONENT SharedLibraries)
+
+     If that's the case, collect names that get appended to the
+     CLIENT_API_FUNCTIONS and CLIENT_API_FUNCTIONS_UNDOCUMENTED variables.
+
+9.  Copy README to COPYING, and truncate it to contain only the licensing
+    information.
+
+10. Copy COPYING to GPLv2.
+
+When merging libmysqlclient build2 package with a new version of the upstream
+package make sure that all the preprocessor include directives reference the
+packaged header files, rather than MariaDB or MySQL headers that are installed
+into the system. It's easy to miss some headers in the package if MariaDB or
+MySQL development package is installed on the host. We also need to check if
+the bundled library headers are picked up. To verify the correctness you can
+build the merged project, concatenate the produced .d files, sort the resulting
+file removing duplicates and edit the result, leaving only the system headers.
+Afterwards grep through the remained headers for some patterns:
+
+$ cat `find . -name '*.d'` | sort -u >headers
+$ emacs headers  # Edit, leaving system headers only.
+$ fgrep -e 'mysql' -e 'mariadb' -e 'openssl' -e 'zlib' headers
+
+
+$ for m in `cat mysql/config.h.cmake.orig | sed -n 's/.*#\s*\(define\|cmakedefine\)\s\{1,\}\([_A-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' | sort -u`; do
+    if grep -q -e "\b$m\b" `find . -name '*.h' -a ! -name 'my_config.h' -a ! -name 'config.h' -o -name '*.c'`; then
+      echo "$m"
+    fi
+  done >used-macros1
+
+$ cat mysql/my_config.h |
+  sed -n 's/#\s*\(define\|undef\)\s\{1,\}\([_A-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' |
+  sort -u >defined-macros
+
+$ diff defined-macros used-macros
+
+Also make sure that the macros set in mysql/my_config.h is still up to date.
+For that purpose obtain the macros that are used in the new source base, then
+obtain the macros (un)defined in the current mysql/my_config.h and compare the
+sets. That can be achieved running the following commands in the build2 project
+root directory:
+
+$ for m in `cat mysql/config.h.cmake.orig | sed -n 's/.*#\s*\(define\|cmakedefine\)\s\{1,\}\([_a-zA-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' | sort -u`; do
+    if grep -q -e "\b$m\b" `find . -name '*.h' -a ! -name 'my_config.h' -a ! -name 'config.h' -o -name '*.c'`; then
+      echo "$m"
+    fi
+  done >used-macros
+
+$ cat mysql/my_config.h |
+  sed -n 's/#\s*\(define\|undef\)\s\{1,\}\([_a-zA-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' |
+  sort -u >defined-macros
+
+diff defined-macros used-macros
+
+To obtain the pre-defined macros for gcc and clang use following commands:
+
+$ gcc -dM -E - < /dev/null
+$ clang -dM -E - < /dev/null
+
+Note that some macro definitions are passed to the preprocessor via the -D
+command line options. Such macro sets may be specific for source file
+subdirectories. It makes sense to check that the sets used for the build2
+package still match the ones for the new upstream package. For that purpose you
+can grep the old and new upstream package CMakeList.txt files for
+ADD_DEFINITIONS() directives and review the changes. If needed, you may also
+run cmake for the upstream project and view the flags.make files created for
+the corresponding source directories. Or, as a last resort, you can see the
+actual compiler and linker command lines running make utility with VERBOSE=1
+option. For VC, you need to set output verbosity to Diagnostics level at the
+'Tools/Options/Projects and Solutions\Build and Run' dialog tab, change the
+current directory to the project build directory in CMD console, and run the
+following command:
+
+> devenv MySQL.sln /build >build.log
+
+It also makes sense to check for changes in compiler and linker flags. You may
+grep CMakeList.txt files for the appropriate directives, or you may compile the
+upstream project in the verbose mode on the platform of interest.
+
+To configure the upstream package for the build use the commands like this:
+
+$ mkdir out
+$ cd out
+$ cmake -DDOWNLOAD_BOOST=1 -DWITH_BOOST=boost -DWITHOUT_SERVER=ON ..
