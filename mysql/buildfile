@@ -201,11 +201,12 @@ else
   #
   cc.coptions += -fno-omit-frame-pointer -fno-strict-aliasing
 
-  # Disable warnings that pop up with -W -Wall.
+  # Disable warnings that pop up with -Wall -Wextra. Upstream doesn't seem to
+  # care about these and it is not easy to disable specific warnings in a way
+  # that works across compilers/version (some -Wno-* options are only
+  # recognized in newer versions).
   #
-  cc.coptions += -Wno-unused-parameter -Wno-unused-variable              \
-                 -Wno-unused-const-variable -Wno-unused-but-set-variable \
-                 -Wno-maybe-uninitialized
+  cc.coptions += -Wno-all -Wno-extra
 }
 
 if ($tclass != 'windows')

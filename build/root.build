@@ -12,11 +12,11 @@ c{*}: extension = c
 # The upstream package uses -std=gnu++03 on Linux. However we can't specify
 # C++03 as the code refers to the strtoull() C function that was introduced
 # in C++11. Specifying C++11 looks like an overkill, and can break something
-# else.
+# else. And Clang doesn't recognize gnu++03, only gnu++98.
 #
 using cxx.guess
 
-cxx.std = ($cxx.id == 'gcc' || $cxx.id == 'clang' ? gnu++03 : 03)
+cxx.std = ($cxx.id == 'gcc' || $cxx.id == 'clang' ? gnu++98 : 03)
 
 using cxx
 
