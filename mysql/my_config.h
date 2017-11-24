@@ -125,8 +125,15 @@
  * Specific for Linux.
  */
 #ifdef __linux__
-#  define HAVE_MMAP64       1
-#  define HAVE_POSIX_TIMERS 1
+#  define HAVE_MMAP64         1
+#  define HAVE_POSIX_TIMERS   1
+
+/*
+ * The fdatasync() system call appeared in FreeBSD more recently (11.1), so we
+ * disable it's usage on FreeBSD.
+ */
+#  define HAVE_DECL_FDATASYNC 1
+#  define HAVE_FDATASYNC      1
 
 /*
  * Irrelevant for the client.
@@ -148,7 +155,6 @@
 #  define HAVE_CLOCK_GETTIME   1
 #  define HAVE_CUSERID         1
 #  define HAVE_SIGEV_THREAD_ID 1
-#  define HAVE_DECL_FDATASYNC  1
 #endif
 
 /*
@@ -182,7 +188,6 @@
 #  define HAVE_FTRUNCATE        1
 #  define HAVE_DLOPEN           1
 #  define HAVE_FCNTL            1
-#  define HAVE_FDATASYNC        1
 #  define HAVE_FSEEKO           1
 #  define HAVE_FSYNC            1
 #  define HAVE_GETPASS          1
