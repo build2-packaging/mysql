@@ -192,7 +192,7 @@ if ($tsys == 'win32-msvc')
 {
   # Disable warnings that pop up with /W3.
   #
-  cc.coptions += /wd4311 /wd4113 /wd4996 /wd4244 /wd4267 /wd4334 /wd4800
+  cc.coptions += /wd4311 /wd4113 /wd4996 /wd4244 /wd4267 /wd4334 /wd4800 /wd4091
 }
 else
 {
