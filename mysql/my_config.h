@@ -41,7 +41,7 @@
 /*
  * Endianess.
  */
-#ifdef FreeBSD_
+#ifdef __FreeBSD__
 #  include <sys/endian.h> /* BYTE_ORDER */
 #else
 #  if defined(_WIN32)
