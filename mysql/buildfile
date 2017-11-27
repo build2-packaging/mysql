@@ -190,13 +190,13 @@ libmysql/:   cc.poptions += $sql_poptions
 if ($tclass == 'windows')
   libmysql/authentication_win/: cc.poptions += -DSECURITY_WIN32
 
-if ($tsys == 'win32-msvc')
+if ($c.class == 'msvc')
 {
   # Disable warnings that pop up with /W3.
   #
   cc.coptions += /wd4311 /wd4113 /wd4996 /wd4244 /wd4267 /wd4334 /wd4800 /wd4091
 }
-else
+elif ($c.class == 'gcc')
 {
   # We don't care about C++ ABI specification conformance, especially given
   # that only C functions are exported. So we omit -fabi-version=2.

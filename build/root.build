@@ -16,7 +16,7 @@ c{*}: extension = c
 #
 using cxx.guess
 
-cxx.std = ($cxx.id == 'gcc' || $cxx.id == 'clang' ? gnu++98 : 03)
+cxx.std = ($cxx.class == 'gcc' ? gnu++98 : 03)
 
 using cxx
 
