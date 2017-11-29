@@ -228,7 +228,9 @@ if ($tclass != 'windows')
 else
 {
   cc.libs += advapi32.lib
-  cc.loptions += "/DEF:$src_base/libmysql/libmysql_exports_win32.def"
+
+  libs{mysqlclient}: \
+    cc.libs =+ "/DEF:$src_base/libmysql/libmysql_exports_win32.def"
 }
 
 # The library clients must include the API header as <mysql/mysql.h>.
