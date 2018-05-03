@@ -145,9 +145,9 @@ mysys_poptions   = "-I$src_base/mysys"
 # To keep "-I$out_root" "-I$src_root" first we use '+=', rather than '=+' to
 # append poptions for the target wildcards.
 #
-   zlib/: cc.poptions += $zlib_poptions
-  mysys/: cc.poptions += $mysys_poptions $zlib_poptions
-strings/: cc.poptions += $strings_poptions -DDISABLE_MYSQL_THREAD_H
+   zlib/ cc.poptions += $zlib_poptions
+  mysys/ cc.poptions += $mysys_poptions $zlib_poptions
+strings/ cc.poptions += $strings_poptions -DDISABLE_MYSQL_THREAD_H
 
 yassl_dir    = $src_base/extra/yassl
 taocrypt_dir = $yassl_dir/taocrypt
@@ -158,17 +158,17 @@ taocrypt_poptions = "-I$taocrypt_dir/include" "-I$taocrypt_dir/mySTL" \
 
 yassl_poptions = "-I$yassl_dir/include" $taocrypt_poptions
 
-extra/yassl/:
+extra/yassl/
 {
-  taocrypt/: cc.poptions += $taocrypt_poptions
+  taocrypt/ cc.poptions += $taocrypt_poptions
 
   cc.poptions += -Dget_tty_password=yassl_mysql_get_tty_password         \
                  -Dget_tty_password_ext=yassl_mysql_get_tty_password_ext \
                  $yassl_poptions
 }
 
-      vio/: cc.poptions += "-I$src_base" $yassl_poptions
-mysys_ssl/: cc.poptions += "-I$src_base" $yassl_poptions $mysys_poptions
+      vio/ cc.poptions += "-I$src_base" $yassl_poptions
+mysys_ssl/ cc.poptions += "-I$src_base" $yassl_poptions $mysys_poptions
 
 # The CLIENT_PROTOCOL_TRACING macro seems to be required for debugging only.
 # However, the compilation falls apart if undefined, so we keep it.
@@ -180,15 +180,15 @@ sql_poptions = "-I$src_base/sql" "-I$src_base/libmysql"         \
 if ($tclass == 'windows')
   sql_poptions += -DAUTHENTICATION_WIN
 
-sql/:        cc.poptions += $sql_poptions
-sql-common/: cc.poptions += $sql_poptions
-libmysql/:   cc.poptions += $sql_poptions
+sql/        cc.poptions += $sql_poptions
+sql-common/ cc.poptions += $sql_poptions
+libmysql/   cc.poptions += $sql_poptions
 
 # The upstream package always adds -DDEBUG_ERRROR_LOG -DWINAUTH_USE_DBUG_LIB.
 # Looks like they are required for debugging only, so let's omit them.
 #
 if ($tclass == 'windows')
-  libmysql/authentication_win/: cc.poptions += -DSECURITY_WIN32
+  libmysql/authentication_win/ cc.poptions += -DSECURITY_WIN32
 
 if ($c.class == 'msvc')
 {
