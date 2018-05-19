@@ -4,4 +4,4 @@
 
 import libs = libmysqlclient%lib{mysqlclient}
 
-exe{driver}: {h c}{*} $libs test{testscript}
+exe{driver}: {h c}{*} $libs testscript

@@ -73,7 +73,7 @@ else
 #    variables name/value hash in the dependency file? This will be fixed
 #    as part of the in module.
 #
-h{version}: in{version} $src_root/file{manifest}
+h{version}: in{version} $src_root/manifest
 
 h{version}: dist  = true
 h{version}: clean = ($src_root != $out_root)
