@@ -3,7 +3,7 @@ name: libmysqlclient
 
 # Note: remember to update doc-url below!
 #
-version: 5.7.20
+version: 5.7.20+1
 
 summary: MySQL C API client library
 license: GPLv2 with FOSS License Exception
