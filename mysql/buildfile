@@ -250,8 +250,10 @@ for h: mysql errmsg mysqld_error mysql_time mysql_version mysql_com \
        mysql/client_plugin mysql/plugin_auth_common                 \
        mysql/psi/psi_base mysql/psi/psi_memory
 {
-  h{$h}@./: install = include/mysql/$path.directory($h)
-  h{$h}@./: install.subdirs = true
+  d = $path.directory($h)
+
+  h{$h}@./$d: install = include/mysql/$d
+  h{$h}@./$d: install.subdirs = true
 }
 
 # Install into the mysql/ subdirectory of, say, /usr/include.
