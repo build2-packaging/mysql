@@ -47,7 +47,7 @@ else
                           vio/file{$regex.apply($vio_win32,   '(.+)', '\1.c')} \
   libmysql/authentication_win/file{*.h *.cpp                                 }
 
-lib{mysqlclient}: libmysql/file{libmysql_exports_win32.def}
+lib{mysqlclient}: libmysql/def{libmysql_exports_win32}
 
 # See bootstrap.build for details.
 #
@@ -127,7 +127,8 @@ else
   # Note that the original package defines the WIN32 macro for VC only,
   # relying on the fact that MinGW GCC defines it by default. However, the
   # macro disappears from the default ones if to compile with -std=c9x (as we
-  # do). So we define it for both VC and MinGW GCC.
+  # do). So we define it for both VC and MinGW GCC (though libmysqlclient
+  # doesn't support building with MinGW GCC at the moment).
   #
   cc.poptions += -DWIN32 -D_WINDOWS -D_WIN32_WINNT=0x0601 -DNOGDI -DNOMINMAX \
                  -DWIN32_LEAN_AND_MEAN -D_MBCS
@@ -226,12 +227,7 @@ if ($tclass != 'windows')
     cc.libs += -lrt # Posix timers.
 }
 else
-{
   cc.libs += advapi32.lib
-
-  libs{mysqlclient}: \
-    cc.libs =+ "/DEF:$src_base/libmysql/libmysql_exports_win32.def"
-}
 
 # The library clients must include the API header as <mysql/mysql.h>.
 #
