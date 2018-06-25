@@ -10,11 +10,11 @@
  * For the semantics of the following macros refer to
  * mysql/config.h.cmake.orig file.
  *
- * Note that we will explicitly undefine macros that are present in the mariadb
- * source code but should not be defined. While this is not technically
- * required, it simplifies the change tracking (see README-DEV). As a bonus we
- * also make sure that they are not get eventually defined by some system
- * headers.
+ * Note that we will explicitly undefine macros that are present in the
+ * libmysqlclient source code but should not be defined. While this is not
+ * technically required, it simplifies the change tracking (see README-DEV).
+ * As a bonus we also make sure that they are not get eventually defined by
+ * some system headers.
  */
 
 /*

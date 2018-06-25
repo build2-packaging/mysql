@@ -24,7 +24,7 @@ using install
 # cmake/mysql_version.cmake for each package release. Also, while at it, check
 # that the protocol version is still correct (the PROTOCOL_VERSION variable).
 #
-# See also how Debian/Fedora package libmariadb if trying to wrap your head
+# See also how Debian/Fedora package libmysqlclient if trying to wrap your head
 # around this mess.
 #
 if ($version.major == 5 && $version.minor == 7 && $version.patch == 20)
