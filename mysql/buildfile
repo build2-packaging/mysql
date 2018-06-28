@@ -24,30 +24,24 @@ lib{mysqlclient}: {h          }{*                       -version} \
          libmysql/{h c        }{*                               } \
             mysql/{h          }{**                              }
 
+tclass = $c.target.class
+tsys   = $c.target.system
+
+linux   = ($tclass == 'linux')
+windows = ($tclass == 'windows')
+
+lib{mysqlclient}: mysys/c{posix_timers}: include = $linux
+
+lib{mysqlclient}:       mysys/{  c    }{$mysys_win32} \
+                          vio/{  c    }{$vio_win32  } \
+  libmysql/authentication_win/{h   cxx}{*           } \
+                  libmysql/def{libmysql_exports_win32}: include = $windows
+
 # Makes sense to distribute READMEs and licenses for the bundled libraries.
 #
 lib{mysqlclient}: zlib/file{README*                        } \
            extra/yassl/file{README COPYING FLOSS-EXCEPTIONS} \
   extra/yassl/taocrypt/file{README COPYING                 }
-
-tclass = $c.target.class
-tsys   = $c.target.system
-
-if ($tclass == 'linux')
-  lib{mysqlclient}: mysys/c{posix_timers}
-else
-  lib{mysqlclient}: mysys/file{posix_timers.c}
-
-if ($tclass == 'windows')
-  lib{mysqlclient}:     mysys/{  c    }{$mysys_win32} \
-                          vio/{  c    }{$vio_win32  } \
-  libmysql/authentication_win/{h   cxx}{*           }
-else
-  lib{mysqlclient}:     mysys/file{$regex.apply($mysys_win32, '(.+)', '\1.c')} \
-                          vio/file{$regex.apply($vio_win32,   '(.+)', '\1.c')} \
-  libmysql/authentication_win/file{*.h *.cpp                                 }
-
-lib{mysqlclient}: libmysql/def{libmysql_exports_win32}
 
 # See bootstrap.build for details.
 #
@@ -90,7 +84,7 @@ h{version}: MYSQL_VERSION_ID =                                         \
   "\(10000 * $version.major + 100 * $version.minor + $version.patch\)"
 h{version}: MYSQL_TCP_PORT = 3306
 h{version}: MYSQL_TCP_PORT_DEFAULT = 0
-h{version}: MYSQL_UNIX_ADDR = ($tclass != 'windows' ? /tmp/mysql.sock : '')
+h{version}: MYSQL_UNIX_ADDR = ($windows ? '' : /tmp/mysql.sock)
 h{version}: COMPILATION_COMMENT = 'Source distribution'
 h{version}: SYS_SCHEMA_VERSION = '1.5.1' # Server-related.
 h{version}: MACHINE_TYPE = $c.target.cpu
@@ -115,11 +109,11 @@ h{version}: SHAREDIR =                                                \
 #
 cc.poptions += -DHAVE_CONFIG_H -DDBUG_OFF
 
-if ($tclass != 'windows')
+if! $windows
 {
   cc.poptions += -D_FILE_OFFSET_BITS=64
 
-  if ($tclass == 'linux')
+  if $linux
     cc.poptions += -D_GNU_SOURCE
 }
 else
@@ -178,7 +172,7 @@ sql_poptions = "-I$src_base/sql" "-I$src_base/libmysql"         \
                -DCLIENT_PROTOCOL_TRACING                        \
                $yassl_poptions $zlib_poptions $strings_poptions
 
-if ($tclass == 'windows')
+if $windows
   sql_poptions += -DAUTHENTICATION_WIN
 
 sql/        cc.poptions += $sql_poptions
@@ -188,7 +182,7 @@ libmysql/   cc.poptions += $sql_poptions
 # The upstream package always adds -DDEBUG_ERRROR_LOG -DWINAUTH_USE_DBUG_LIB.
 # Looks like they are required for debugging only, so let's omit them.
 #
-if ($tclass == 'windows')
+if $windows
   libmysql/authentication_win/ cc.poptions += -DSECURITY_WIN32
 
 if ($c.class == 'msvc')
@@ -214,18 +208,18 @@ elif ($c.class == 'gcc')
   cc.coptions += -Wno-all -Wno-extra -Wno-error
 }
 
-if ($tclass != 'windows')
+if! $windows
 {
   # On Linux the upstream package also passes the cmake-generated
   # libmysql.ver file. The symbols it contains are hard-coded into
   # libmysql/CMakeList.txt. We have dropped the file for now.
   #
-  if ($tclass == 'linux')
+  if $linux
     cc.loptions += -Wl,--no-undefined # Make sure all symbols are resolvable.
 
   cc.libs += ($tclass == 'bsd' ? -lexecinfo : -ldl) -lpthread -lm
 
-  if ($tclass == 'linux')
+  if $linux
     cc.libs += -lrt # Posix timers.
 }
 else

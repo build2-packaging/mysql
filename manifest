@@ -17,5 +17,5 @@ email: mysql@lists.mysql.com; Mailing list.
 package-email: packaging@build2.org; Mailing list.
 build-email: builds@build2.org
 build-exclude: */*-mingw32; Unsupported.
-depends: * build2 >= 0.7.0-
-depends: * bpkg >= 0.7.0-
+depends: * build2 >= 0.8.0-
+depends: * bpkg >= 0.8.0-
