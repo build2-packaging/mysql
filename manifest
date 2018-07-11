@@ -5,9 +5,10 @@ name: libmysqlclient
 #
 version: 5.7.20+1
 
+project: mysql
 summary: MySQL C API client library
 license: GPLv2 with FOSS License Exception
-tags: mysql, database, client, connector, library, c, api, interface
+tags: database, client, connector, library, c, api, interface
 description-file: README
 url: https://www.mysql.com
 doc-url: https://dev.mysql.com/doc/refman/5.7/en/c-api.html
