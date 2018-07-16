@@ -62,11 +62,6 @@ else
 #    Fedora/RHEL:    /var/lib/mysql/mysql.sock
 #    Source package: /tmp/mysql.sock
 #
-# @@ Note that if variable values changes (say install root is reconfigured),
-#    then the version files is not regenerated. Should we store instantiated
-#    variables name/value hash in the dependency file? This will be fixed
-#    as part of the in module.
-#
 h{version}: in{version} $src_root/manifest
 
 h{version}: dist  = true
