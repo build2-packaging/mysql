@@ -3,7 +3,7 @@ name: libmysqlclient
 
 # Note: remember to update doc-url below!
 #
-version: 5.7.20+1
+version: 5.7.20+2
 
 project: mysql
 summary: MySQL C API client library
