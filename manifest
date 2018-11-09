@@ -16,7 +16,7 @@ src-url: https://git.build2.org/cgit/packaging/mysql/libmysqlclient/tree/
 package-url: https://git.build2.org/cgit/packaging/mysql/
 email: mysql@lists.mysql.com; Mailing list.
 package-email: packaging@build2.org; Mailing list.
-build-email: builds@build2.org
+build-error-email: builds@build2.org
 build-exclude: */*-mingw32; Unsupported.
 depends: * build2 >= 0.8.0-
 depends: * bpkg >= 0.8.0-
