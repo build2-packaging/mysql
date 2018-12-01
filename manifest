@@ -14,9 +14,10 @@ url: https://www.mysql.com
 doc-url: https://dev.mysql.com/doc/refman/5.7/en/c-api.html
 src-url: https://git.build2.org/cgit/packaging/mysql/libmysqlclient/tree/
 package-url: https://git.build2.org/cgit/packaging/mysql/
-email: mysql@lists.mysql.com; Mailing list.
-package-email: packaging@build2.org; Mailing list.
+email: mysql@lists.mysql.com        ; Mailing list.
+package-email: packaging@build2.org ; Mailing list.
 build-error-email: builds@build2.org
-build-exclude: */*-mingw32; Unsupported.
+#builds: all : -( +windows &gcc ) ; MinGW GCC is not supported.
+build-exclude: **/**-mingw32 ; MinGW GCC is not supported.
 depends: * build2 >= 0.8.0-
 depends: * bpkg >= 0.8.0-
