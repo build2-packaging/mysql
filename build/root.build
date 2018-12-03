@@ -22,3 +22,9 @@ using cxx
 
 hxx{*}: extension = hpp
 cxx{*}: extension = cpp
+
+if ($c.class == 'msvc')
+{
+  cc.poptions += -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
+  cc.coptions += /wd4251 /wd4275 /wd4800
+}
