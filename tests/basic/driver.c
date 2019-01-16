@@ -1,6 +1,6 @@
 /*
  * file      : tests/basic/driver.c
- * copyright : Copyright (c) 2009-2018 Code Synthesis Tools CC
+ * copyright : Copyright (c) 2009-2019 Code Synthesis Tools CC
  * license   : GPLv2 with FOSS License Exception; see accompanying COPYING file
  */
 
