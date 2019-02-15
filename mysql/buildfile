@@ -210,7 +210,11 @@ if! $windows
   # libmysql/CMakeList.txt. We have dropped the file for now.
   #
   if $linux
-    cc.loptions += -Wl,--no-undefined # Make sure all symbols are resolvable.
+  {
+    # Make sure all symbols are resolvable.
+    #
+    libs{mysqlclient}: cc.loptions += -Wl,--no-undefined
+  }
 
   cc.libs += ($tclass == 'bsd' ? -lexecinfo : -ldl) -lpthread -lm
 
