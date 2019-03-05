@@ -28,7 +28,11 @@ tclass = $c.target.class
 tsys   = $c.target.system
 
 linux   = ($tclass == 'linux')
+bsd     = ($tclass == 'bsd')
 windows = ($tclass == 'windows')
+
+gcc   = ($c.class == 'gcc')
+msvc  = ($c.class == 'msvc')
 
 lib{mysqlclient}: mysys/c{posix_timers}: include = $linux
 
@@ -43,13 +47,6 @@ lib{mysqlclient}: zlib/file{README*                        } \
            extra/yassl/file{README COPYING FLOSS-EXCEPTIONS} \
   extra/yassl/taocrypt/file{README COPYING                 }
 
-# See bootstrap.build for details.
-#
-if $version.pre_release
-  lib{mysqlclient}: bin.lib.version = @"-$version.project_id"
-else
-  lib{mysqlclient}: bin.lib.version = @"-$abi_version"
-
 # Include the generated version header into the distribution (so that we
 # don't pick up an installed one) and don't remove it when cleaning in src (so
 # that clean results in a state identical to distributed).
@@ -63,41 +60,53 @@ else
 #    Source package: /tmp/mysql.sock
 #
 h{version}: in{version} $src_root/manifest
+h{version}:
+{
+  dist  = true
+  clean = ($src_root != $out_root)
 
-h{version}: dist  = true
-h{version}: clean = ($src_root != $out_root)
-h{version}: in.symbol = '@'
+  in.symbol = '@'
 
-h{version}: PROTOCOL_VERSION = $protocol_version
-h{version}: VERSION = $version.project
-h{version}: MYSQL_BASE_VERSION = "$version.major.$version.minor"
-h{version}: MYSQL_VERSION_MAJOR = $version.major
-h{version}: MYSQL_VERSION_MINOR = $version.minor
-h{version}: MYSQL_SERVER_SUFFIX = ''
-h{version}: DOT_FRM_VERSION = 6 # File format (server-related).
-h{version}: MYSQL_VERSION_ID =                                         \
-  "\(10000 * $version.major + 100 * $version.minor + $version.patch\)"
-h{version}: MYSQL_TCP_PORT = 3306
-h{version}: MYSQL_TCP_PORT_DEFAULT = 0
-h{version}: MYSQL_UNIX_ADDR = ($windows ? '' : /tmp/mysql.sock)
-h{version}: COMPILATION_COMMENT = 'Source distribution'
-h{version}: SYS_SCHEMA_VERSION = '1.5.1' # Server-related.
-h{version}: MACHINE_TYPE = $c.target.cpu
-h{version}: SYSTEM_TYPE  = $tsys
-h{version}: DEFAULT_BASEDIR =                                     \
-  ($install.root != [null]                                        \
-   ? $regex.replace("$install.resolve($install.root)", '\\', '/') \
-   : '')
-h{version}: PLUGINDIR =                                                     \
-  ($install.root != [null]                                                  \
-   ? $regex.replace($install.resolve($install.lib)/mysql/plugin, '\\', '/') \
-   : '')
-h{version}: SHAREDIR =                                                \
-  ($install.root != [null]                                            \
-   ? $regex.replace($install.resolve($install.data_root)/share/mysql, \
-                    '\\', '/')                                        \
-   : '')
+  PROTOCOL_VERSION = $protocol_version
+  VERSION = $version.project
+  MYSQL_BASE_VERSION = "$version.major.$version.minor"
+  MYSQL_VERSION_MAJOR = $version.major
+  MYSQL_VERSION_MINOR = $version.minor
+  MYSQL_SERVER_SUFFIX = ''
+  DOT_FRM_VERSION = 6 # File format (server-related).
 
+  MYSQL_VERSION_ID =                                                     \
+    "\(10000 * $version.major + 100 * $version.minor + $version.patch\)"
+
+  MYSQL_TCP_PORT = 3306
+  MYSQL_TCP_PORT_DEFAULT = 0
+  MYSQL_UNIX_ADDR = ($windows ? '' : /tmp/mysql.sock)
+  COMPILATION_COMMENT = 'Source distribution'
+  SYS_SCHEMA_VERSION = '1.5.1' # Server-related.
+  MACHINE_TYPE = $c.target.cpu
+  SYSTEM_TYPE  = $tsys
+
+  DEFAULT_BASEDIR = ($install.root != [null]                             \
+                     ? $regex.replace("$install.resolve($install.root)", \
+                                      '\\',                              \
+                                      '/')                               \
+                     : '')
+
+  PLUGINDIR = ($install.root != [null]                                       \
+               ? $regex.replace($install.resolve($install.lib)/mysql/plugin, \
+                                '\\',                                        \
+                                '/')                                         \
+               : '')
+
+  SHAREDIR = ($install.root != [null]                                            \
+              ? $regex.replace($install.resolve($install.data_root)/share/mysql, \
+                               '\\',                                             \
+                               '/')                                              \
+              : '')
+}
+
+# Build options.
+#
 # We have dropped the macro definitions that are not used in the package code:
 #
 #   -DHAVE_LIBEVENT1
@@ -180,13 +189,13 @@ libmysql/   cc.poptions += $sql_poptions
 if $windows
   libmysql/authentication_win/ cc.poptions += -DSECURITY_WIN32
 
-if ($c.class == 'msvc')
+if $msvc
 {
   # Disable warnings that pop up with /W3.
   #
   cc.coptions += /wd4311 /wd4113 /wd4996 /wd4244 /wd4267 /wd4334 /wd4800 /wd4091
 }
-elif ($c.class == 'gcc')
+elif $gcc
 {
   # We don't care about C++ ABI specification conformance, especially given
   # that only C functions are exported. So we omit -fabi-version=2.
@@ -216,7 +225,7 @@ if! $windows
     libs{mysqlclient}: cc.loptions += -Wl,--no-undefined
   }
 
-  cc.libs += ($tclass == 'bsd' ? -lexecinfo : -ldl) -lpthread -lm
+  cc.libs += ($bsd ? -lexecinfo : -ldl) -lpthread -lm
 
   if $linux
     cc.libs += -lrt # Posix timers.
@@ -224,9 +233,18 @@ if! $windows
 else
   cc.libs += advapi32.lib
 
+# Export options.
+#
 # The library clients must include the API header as <mysql/mysql.h>.
 #
 lib{mysqlclient}: cc.export.poptions = "-I$out_root" "-I$src_root"
+
+# See bootstrap.build for details.
+#
+if $version.pre_release
+  lib{mysqlclient}: bin.lib.version = @"-$version.project_id"
+else
+  lib{mysqlclient}: bin.lib.version = @"-$abi_version"
 
 # Let's install the bare minimum of headers: mysql.h, errmsg.h, mysqld_error.h
 # and headers they recursively include.
@@ -234,6 +252,8 @@ lib{mysqlclient}: cc.export.poptions = "-I$out_root" "-I$src_root"
 h{*}:   install = false
 hxx{*}: install = false
 
+# Install into the mysql/ subdirectory of, say, /usr/include/.
+#
 # @@ Fix once LHS pair generation is implemented.
 #
 for h: mysql errmsg mysqld_error mysql_time mysql_version mysql_com \
@@ -244,9 +264,6 @@ for h: mysql errmsg mysqld_error mysql_time mysql_version mysql_com \
   d = $path.directory($h)
 
   h{$h}@./$d: install = include/mysql/$d
-  h{$h}@./$d: install.subdirs = true
 }
 
-# Install into the mysql/ subdirectory of, say, /usr/include.
-#
 h{version}: install = include/mysql/
