@@ -1,0 +1,23 @@
+# file      : build/root.build
+# copyright : Copyright (c) 2016-2019 Code Synthesis Ltd
+# license   : GPLv2 with Universal FOSS Exception; see accompanying LICENSE file
+
+using in
+
+using c
+
+h{*}: extension = h
+c{*}: extension = c
+
+cxx.std = latest
+
+using cxx
+
+hxx{*}: extension = h
+cxx{*}: extension = cc
+
+if ($c.class == 'msvc')
+{
+  cc.poptions += -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
+  cc.coptions += /wd4251 /wd4275 /wd4800
+}

@@ -1,0 +1,4 @@
+[submodule "upstream"]
+	path = upstream
+	url = https://github.com/mysql/mysql-server.git
+	ignore = untracked

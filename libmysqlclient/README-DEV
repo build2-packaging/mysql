@@ -1,0 +1,98 @@
+This document describes how libmysqlclient was packaged for build2. In
+particular, this understanding will be useful when upgrading to a new upstream
+version. See ../README-DEV for general notes on MySQL packaging.
+
+Symlink the required upstream components and provide our own implementations
+for auto-generated headers:
+
+$ ln -s ../upstream/LICENSE
+
+$ ln -s ../../upstream/{extra/zlib,strings,vio,sql-common,sql,mysys,mysys_ssl,libbinlogevents,libmysql} \
+  mysql
+
+$ ln -s ../../upstream/include mysql/mysql
+
+Note that we unable to generate mysql_version.h directly from the template as
+it is included as "mysql_version.h" in upstream's source code, which makes
+impossible using the header-generating machinery. That's why we create
+mysql/mysql_version.h that includes <mysql/version.h> that we auto-generate
+from upstream's mysql/mysql_version.h.in.
+
+$ ln -s zlib/zconf.h.cmakein mysql/zconf.h.cmakein.orig
+
+Use mysql/zconf.h.cmakein.orig for creating mysql/zconf.h manually,
+defining/undefining macros introduced with #cmakedefine.
+
+$ ln -s libbinlogevents/binlog_config.h.cmake mysql/binlog_config.h.cmake.orig
+
+Use mysql/binlog_config.h.cmake.orig for creating mysql/binlog_config.h
+manually, defining/undefining macros introduced with #cmakedefine.
+
+$ ln -s ../../upstream/config.h.cmake mysql/config.h.cmake.orig
+
+Use mysql/config.h.cmake.orig for creating mysql/my_config.h and
+mysql/config.h.in, defining/undefining macros introduced with #cmakedefine.
+
+Most of the macro values in mysql/my_config.h can be determined at the
+preprocessing time using the pre-defined macros. To obtain the pre-defined
+macros for gcc and clang run:
+
+$ gcc -dM -E - < /dev/null
+$ clang -dM -E - < /dev/null
+
+Some macro values can not be easily determined at the preprocessing time. We
+define them based on the supported platform tests and add mysql/assert.c,
+containing compile-time assertions for the macros in question.
+
+mysql/config.h.in defines macros that depend on the version and build2
+configuration variables.
+
+Note that if it is uneasy to define a macro, you may check if you really need
+to, grepping for its usages, for example:
+
+grep -e CPU_LEVEL1_DCACHE_LINESIZE `find -L . -name '*.c*' -o -name '*.h*'`
+
+And it may become obvious that the macro is not used in libmysqlclient.
+
+Re-creating mysql/my_config.h from scratch every time we upgrade to a new
+upstream version would be a real pain. Instead we can only (un)define the
+newly introduced macros, comparing the already defined and currently used
+macro sets:
+
+$ for m in `cat mysql/{config,binlog_config}.h.cmake.orig | \
+            sed -n 's/.*#\s*\(define\|cmakedefine\)\s\{1,\}\([_a-zA-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' | sort -u`; do
+    if grep -q -e "\b$m\b" `find -L . -name '*.h' -a ! -name my_config.h -a ! -name config.h -o -name '*.c' -o -name '*.cc' -a ! -name mysqld.cc -o -name '*.cpp' -o -name '*.hpp'`; then
+      echo "$m"
+    fi
+  done >used-macros
+
+$ cat mysql/my_config.h mysql/config.h.in mysql/binlog_config.h |
+  sed -n 's/#\s*\(define\|undef\)\s\{1,\}\([_a-zA-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' |
+  sort -u >defined-macros
+
+$ diff defined-macros used-macros >diff-macros
+
+Create mysql/libmysql_exports.def, containing the exported names list. For
+that purpose grep through libmysql/CMakeLists.txt to see how the .def file is
+generated for Windows. The corresponding code normally looks like:
+
+MERGE_LIBRARIES_SHARED(libmysql ${LIBS_TO_MERGE}
+  EXPORTS ${CLIENT_API_FUNCTIONS} ${CLIENT_API_FUNCTIONS_UNDOCUMENTED}
+  COMPONENT SharedLibraries)
+
+If that's the case, collect names that get assigned to the
+CLIENT_API_FUNCTIONS and CLIENT_API_FUNCTIONS_UNDOCUMENTED variables.
+
+Extract the auto-generated mysqld_error.h from Fedora's community-mysql-devel
+package and copy it into mysql/:
+
+$ wget https://rpmfind.net/linux/fedora/linux/development/rawhide/Everything/aarch64/os/Packages/c/community-mysql-devel-8.0.15-1.fc30.aarch64.rpm
+$ rpm2cpio community-mysql-devel-8.0.15-1.fc30.aarch64.rpm | cpio -idv ./usr/include/mysql/mysqld_error.h
+
+Deducing the source file set and compilation/linking options can probably be
+performed by analyzing the root and component-specific CMakeLists.txt files
+(see libmysql/, zlib/, etc) and .cmake files under the upstream's cmake/
+subdirectory. In practice, however, you may also need to refer to
+cmake-generated flags.make files or, as a last resort, to see the actual
+compiler and linker command lines in the build log (see ../README-DEV for
+details).

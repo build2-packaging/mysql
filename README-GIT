@@ -1,4 +1,5 @@
-The checked out mysql/version.h will be overwritten during the build process
-but these changes should be ignored. To do this automatically, run:
+The checked out libmysqlclient/mysql/version.h will be overwritten during the
+build process but these changes should be ignored. To do this automatically,
+run:
 
-git update-index --assume-unchanged mysql/version.h
+git update-index --assume-unchanged libmysqlclient/mysql/version.h
