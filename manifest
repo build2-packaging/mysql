@@ -3,7 +3,7 @@ name: libmysqlclient
 
 # Note: remember to update doc-url below!
 #
-version: 5.7.20+5
+version: 5.7.20+6
 
 project: mysql
 summary: MySQL C API client library
@@ -12,7 +12,7 @@ tags: database, client, connector, library, c, api, interface
 description-file: README
 url: https://www.mysql.com
 doc-url: https://dev.mysql.com/doc/refman/5.7/en/c-api.html
-src-url: https://git.build2.org/cgit/packaging/mysql/libmysqlclient/tree/
+src-url: https://git.build2.org/cgit/packaging/mysql/mysql/libmysqlclient/tree/
 package-url: https://git.build2.org/cgit/packaging/mysql/
 email: mysql@lists.mysql.com        ; Mailing list.
 package-email: packaging@build2.org ; Mailing list.

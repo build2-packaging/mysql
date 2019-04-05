@@ -90,19 +90,6 @@ $ cat `find . -name '*.d'` | sort -u >headers
 $ emacs headers  # Edit, leaving system headers only.
 $ fgrep -e 'mysql' -e 'mariadb' -e 'openssl' -e 'zlib' headers
 
-
-$ for m in `cat mysql/config.h.cmake.orig | sed -n 's/.*#\s*\(define\|cmakedefine\)\s\{1,\}\([_A-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' | sort -u`; do
-    if grep -q -e "\b$m\b" `find . -name '*.h' -a ! -name 'my_config.h' -a ! -name 'config.h' -o -name '*.c'`; then
-      echo "$m"
-    fi
-  done >used-macros1
-
-$ cat mysql/my_config.h |
-  sed -n 's/#\s*\(define\|undef\)\s\{1,\}\([_A-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' |
-  sort -u >defined-macros
-
-$ diff defined-macros used-macros
-
 Also make sure that the macros set in mysql/my_config.h is still up to date.
 For that purpose obtain the macros that are used in the new source base, then
 obtain the macros (un)defined in the current mysql/my_config.h and compare the
