@@ -17,7 +17,9 @@ need to make sure that packages do not share upstream source files via
 subdirectory symlinks, not to also share the related intermediate files. If
 several packages need to compile the same upstream source file, then only one
 of them can symlink it via the parent directory while others must symlink it
-directly.
+directly. We also add the `ignore = untracked` configuration option into
+.gitmodules to make sure that git ignores the intermediate build files under
+upstream/ subdirectory.
 
 The upstream package can be configured to contain a specific feature set. We
 reproduce the union of features configured for the upstream source package in
