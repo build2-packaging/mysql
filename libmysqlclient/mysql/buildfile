@@ -13,6 +13,8 @@ bsd     = ($tclass == 'bsd')
 macos   = ($tclass == 'macos')
 windows = ($tclass == 'windows')
 
+msvc_runtime = ($tsys == 'win32-msvc')
+
 gcc  = ($c.class == 'gcc')
 msvc = ($c.class == 'msvc')
 
@@ -238,7 +240,7 @@ if! $windows
     cc.libs += -lrt # Posix timers.
 }
 else
-  cc.libs += $regex.apply(advapi32, '(.+)', $msvc ? '\1.lib' : '-l\1')
+  cc.libs += $regex.apply(advapi32, '(.+)', $msvc_runtime ? '\1.lib' : '-l\1')
 
 # Export options.
 #
