@@ -15,8 +15,9 @@ windows = ($tclass == 'windows')
 
 msvc_runtime = ($tsys == 'win32-msvc')
 
-gcc  = ($c.class == 'gcc')
-msvc = ($c.class == 'msvc')
+gcc        = ($c.class == 'gcc')
+msvc       = ($c.class == 'msvc')
+clang_msvc = ($c.id == 'clang' && $msvc_runtime)
 
 # Windows-specific utilities.
 #
@@ -199,6 +200,11 @@ else
   #
   libmysql/authentication_win/ cc.poptions += -DSECURITY_WIN32
 }
+
+# Disable the 'POSIX name for this item is deprecated' warnings.
+#
+if $clang_msvc
+  cc.coptions += -Wno-deprecated-declarations
 
 if $msvc
 {
