@@ -7,7 +7,7 @@ for auto-generated headers:
 
 $ ln -s ../upstream/LICENSE
 
-$ ln -s ../../upstream/{extra/zlib,strings,vio,sql-common,sql,mysys,mysys_ssl,libbinlogevents,libmysql} \
+$ ln -s ../../upstream/{strings,vio,sql-common,sql,mysys,mysys_ssl,libbinlogevents,libmysql} \
   mysql
 
 $ ln -s ../../upstream/include mysql/mysql
@@ -17,11 +17,6 @@ it is included as "mysql_version.h" in upstream's source code, which makes
 impossible using the header-generating machinery. That's why we create
 mysql/mysql_version.h that includes <mysql/version.h> that we auto-generate
 from upstream's mysql/mysql_version.h.in.
-
-$ ln -s zlib/zconf.h.cmakein mysql/zconf.h.cmakein.orig
-
-Use mysql/zconf.h.cmakein.orig for creating mysql/zconf.h manually,
-defining/undefining macros introduced with #cmakedefine.
 
 $ ln -s libbinlogevents/binlog_config.h.cmake mysql/binlog_config.h.cmake.orig
 
@@ -91,7 +86,7 @@ $ rpm2cpio community-mysql-devel-8.0.15-1.fc30.aarch64.rpm | cpio -idv ./usr/inc
 
 Deducing the source file set and compilation/linking options can probably be
 performed by analyzing the root and component-specific CMakeLists.txt files
-(see libmysql/, zlib/, etc) and .cmake files under the upstream's cmake/
+(see libmysql/, etc) and .cmake files under the upstream's cmake/
 subdirectory. In practice, however, you may also need to refer to
 cmake-generated flags.make files or, as a last resort, to see the actual
 compiler and linker command lines in the build log (see ../README-DEV for

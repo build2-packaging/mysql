@@ -26,16 +26,26 @@ reproduce the union of features configured for the upstream source package in
 Debian and Fedora distributions. The configuration options defining these sets
 are specified in the Debian's rules and Fedora's RPM .spec files. Note,
 however, that at the time of this writing the latest packaged versions are
-different: 5.7.25 on Debian and 8.0.15 on Fedora. These files can be obtained
+different: 5.7.26 on Debian and 8.0.15 on Fedora. These files can be obtained
 as follows:
 
 $ wget https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/source/tree/Packages/c/community-mysql-8.0.15-1.fc30.src.rpm
 $ rpm2cpio community-mysql-8.0.15-1.fc30.src.rpm | cpio -civ '*.spec'
 
-#$ wget http://deb.debian.org/debian/pool/main/m/mysql-5.7/mysql-5.7_5.7.25-1.debian.tar.xz
-#$ tar xf mysql-5.7_5.7.25-1.debian.tar.xz debian/rules
+#$ wget http://deb.debian.org/debian/pool/main/m/mysql-5.7/mysql-5.7_5.7.26-1.debian.tar.xz
+#$ tar xf mysql-5.7_5.7.26-1.debian.tar.xz debian/rules
 
-Instead of using MySQL 5.7.25 Debian's rules for MySQL 8.0.15 we are
+As a side note, on Debian and Fedora the source, library, and headers are
+packaged as follows:
+
+                src              library               headers
+Debian/Ubuntu:  mysql-5.7        libmysqlclient20      libmysqlclient-dev
+Fedora/RHEL:    community-mysql  community-mysql-libs  community-mysql-devel
+
+Search for the Debian and Fedora packages at https://packages.debian.org/search
+and https://apps.fedoraproject.org/packages/.
+
+Instead of using MySQL 5.7.26 Debian's rules for MySQL 8.0.15 we are
 packaging, let's use upstream/packaging/deb-in/rules.in. That's not ideal but
 is, probably, better than nothing.
 
@@ -47,21 +57,15 @@ Debian:
 
 Fedora:
 
-  -DWITH_INNODB_MEMCACHED=ON -DENABLED_LOCAL_INFILE=ON
+  -DWITH_INNODB_MEMCACHED=ON -DENABLED_LOCAL_INFILE=ON -DWITH_SYSTEM_LIBS=ON
 
-Omitting options that are not related to the client library we end up with:
+Omitting options that are not related to the client library or introduce
+external dependencies that are not packaged for build2 we end up with:
 
-  -DENABLED_LOCAL_INFILE=ON
+  -DENABLED_LOCAL_INFILE=ON -DWITH_ZLIB=system -DWITH_SSL=system
 
 See the configuration options description at
 https://dev.mysql.com/doc/refman/8.0/en/source-configuration-options.html
-
-As a side note, on Debian and Fedora libmysqlclient is packaged under the
-libmysqlclient20 and community-mysql-libs package names respectively. The
-headers-containing development packages are libmysqlclient-dev and
-community-mysql-devel. Search for the Debian and Fedora packages at
-https://packages.debian.org/search and
-https://apps.fedoraproject.org/packages/.
 
 Normally, when packaging a cmake-based project, we try to deduce the source
 file and compilation/linking option sets analyzing the root and
@@ -77,7 +81,7 @@ On POSIX:
 $ mkdir build
 $ cd build
 $ cmake -DDOWNLOAD_BOOST=ON -DWITH_BOOST=../boost -DWITHOUT_SERVER=ON \
-        -DENABLED_LOCAL_INFILE=ON ..
+        -DENABLED_LOCAL_INFILE=ON -DWITH_ZLIB=system -DWITH_SSL=system ..
 
 $ make VERBOSE=1 >build.log 2>&1
 
@@ -98,7 +102,8 @@ Build libssl from cppget.org, install to C:/openssl and rename *.dll.lib to
 > mkdir build
 > cd build
 > cmake -DDOWNLOAD_BOOST=ON -DWITH_BOOST=../boost -DWITHOUT_SERVER=ON ^
-  -DENABLED_LOCAL_INFILE=ON ..  -G "Visual Studio 15 2017 Win64" ^ >config.log 2>&1
+  -DENABLED_LOCAL_INFILE=ON -DWITH_ZLIB=system -DWITH_SSL=system ..  ^
+  -G "Visual Studio 15 2017 Win64" >config.log 2>&1
 > devenv MySQL.sln /build RelWithDebInfo >build-log 2>&1
 
 With MinGW GCC:
@@ -112,7 +117,8 @@ it fails at the compilation stage:
 > mkdir build
 > cd build
 > cmake -DDOWNLOAD_BOOST=ON -DWITH_BOOST=../boost -DWITHOUT_SERVER=ON ^
-  -DENABLED_LOCAL_INFILE=ON ..  -G  "MinGW Makefiles"
+  -DENABLED_LOCAL_INFILE=ON -DWITH_ZLIB=system -DWITH_SSL=system .. ^
+  -G  "MinGW Makefiles"
 > mingw32-make
 
 When the packaging is complete, build all the project packages in source tree
@@ -127,4 +133,4 @@ Afterwards grep through the remained headers for some patterns:
 
 $ cat `find . -type f -name '*.d'` | sort -u >headers
 $ emacs headers  # Edit, leaving system headers only.
-$ fgrep -e 'mysql' -e 'mariadb' -e 'openssl' -e 'zlib' headers
+$ fgrep -e 'mysql' -e 'mariadb' headers

@@ -3,7 +3,7 @@ name: libmysqlclient
 
 # Note: remember to update doc-url below!
 #
-version: 8.0.15+6
+version: 8.0.15+7
 
 project: mysql
 summary: MySQL C API client library
@@ -20,5 +20,6 @@ build-error-email: builds@build2.org
 builds: all : -( +windows &gcc ) ; MinGW GCC is not supported.
 depends: * build2 >= 0.12.0
 depends: * bpkg >= 0.12.0
+depends: libz >= 1.2.1100
 depends: libcrypto >= 1.1.1
 depends: libssl >= 1.1.1

@@ -4,6 +4,7 @@
 
 import imp_libs  = libssl%lib{ssl}
 import imp_libs += libcrypto%lib{crypto}
+import imp_libs += libz%lib{z}
 
 tclass = $c.target.class
 tsys   = $c.target.system
@@ -23,7 +24,6 @@ vio_win32 = viopipe vioshm
 
 lib{mysqlclient}: {h c        }{*            -version -config} \
                   {h          }{              version  config} \
-             zlib/{h c        }{*                            } \
           strings/{    hxx cxx}{*   -do_ctype -*dump* -*_to_*} \
             mysql/{h          }{**                           } \
   libbinlogevents/{h          }{**                           } \
@@ -52,7 +52,7 @@ libmysql/authentication_win/{hxx cxx}{*           }: include = $windows
 # Makes sense to distribute READMEs for the bundled libraries. Note that their
 # licenses are incorporated into the root LICENSE file.
 #
-lib{mysqlclient}: zlib/file{README} strings/file{README}
+lib{mysqlclient}: strings/file{README}
 
 # Include the generated version header into the distribution (so that we
 # don't pick up an installed one) and don't remove it when cleaning in src (so
@@ -156,31 +156,22 @@ switch $tclass
 #
 cc.poptions =+ "-I$out_root" "-I$src_root" "-I$src_base" "-I$src_base/mysql"
 
-zlib_dir = $src_base/zlib
-
 # To keep "-I$out_root" "-I$src_root" first we use '+=', rather than '=+' to
 # append poptions for the directory scopes.
 #
-zlib/ cc.poptions += "-I$zlib_dir"
-
 strings/ cc.poptions += -DDISABLE_MYSQL_THREAD_H
 
 libbinlogevents_dir = $src_base/libbinlogevents
 
-mysys/ cc.poptions += "-I$zlib_dir" "-I$libbinlogevents_dir/export"
+mysys/ cc.poptions += "-I$libbinlogevents_dir/export"
 
 libmysql/ cc.poptions += "-I$libbinlogevents_dir/export" \
                          -DCLIENT_PROTOCOL_TRACING
 
-sql-common/ cc.poptions += "-I$zlib_dir"                    \
-                           "-I$libbinlogevents_dir/export"  \
+sql-common/ cc.poptions += "-I$libbinlogevents_dir/export"  \
                            "-I$libbinlogevents_dir/include"
 
-if! $windows
-{
-  zlib/ cc.poptions += -D_LARGEFILE64_SOURCE=1
-}
-else
+if $windows
 {
   sql-common/ cc.poptions += -DAUTHENTICATION_WIN
 
@@ -189,11 +180,6 @@ else
   #
   libmysql/authentication_win/ cc.poptions += -DSECURITY_WIN32
 }
-
-# Disable the 'POSIX name for this item is deprecated' warnings.
-#
-if ($c.id == 'clang' && $tsys == 'win32-msvc')
-  cc.coptions += -Wno-deprecated-declarations
 
 switch $c.class
 {
@@ -209,6 +195,11 @@ switch $c.class
     # treating them as errors.
     #
     cc.coptions += -Wno-all -Wno-extra -Wno-error
+
+    # Disable the Clang targeting MSVC warnings.
+    #
+    if ($c.id == 'clang' && $tsys == 'win32-msvc')
+      cc.coptions += -Wno-deprecated-declarations
   }
   case 'msvc'
   {
