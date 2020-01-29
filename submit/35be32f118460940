@@ -1,0 +1,6 @@
+: 1
+name: libmysqlclient
+version: 8.0.15+7
+project: mysql
+summary: MySQL C API client library
+license: GPLv2 with Universal FOSS Exception
