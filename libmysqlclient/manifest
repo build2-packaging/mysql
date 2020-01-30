@@ -3,7 +3,7 @@ name: libmysqlclient
 
 # Note: remember to update doc-url below!
 #
-version: 8.0.15+7
+version: 8.0.15+8
 
 project: mysql
 summary: MySQL C API client library
@@ -17,7 +17,9 @@ package-url: https://git.build2.org/cgit/packaging/mysql/
 email: mysql@lists.mysql.com        ; Mailing list.
 package-email: packaging@build2.org ; Mailing list.
 build-error-email: builds@build2.org
-builds: all : -( +windows &gcc ) ; MinGW GCC is not supported.
+builds: all
+builds: -( +windows &gcc ) ; MinGW GCC is not supported.
+builds: -static            ; Implementation uses C++ and requires special linking steps.
 depends: * build2 >= 0.12.0
 depends: * bpkg >= 0.12.0
 depends: libz >= 1.2.1100
