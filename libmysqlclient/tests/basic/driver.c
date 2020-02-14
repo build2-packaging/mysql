@@ -1,6 +1,5 @@
 /*
  * file      : tests/basic/driver.c
- * copyright : Copyright (c) 2009-2019 Code Synthesis Tools CC
  * license   : GPLv2 with Universal FOSS Exception; see accompanying LICENSE file
  */
 
