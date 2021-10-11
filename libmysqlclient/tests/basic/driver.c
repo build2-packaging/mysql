@@ -1,5 +1,4 @@
-/*
- * file      : tests/basic/driver.c
+/* file      : tests/basic/driver.c
  * license   : GPLv2 with Universal FOSS Exception; see accompanying LICENSE file
  */
 

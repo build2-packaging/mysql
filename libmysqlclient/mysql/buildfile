@@ -38,7 +38,6 @@ lib{mysqlclient}: {h c        }{*            -version -config} \
          sql/auth/{        cxx}{password sha2_password_common} \
        sql-common/{    hxx cxx}{*                            } \
          libmysql/{    hxx cxx}{*                     -*test*} \
-                  {        def}{libmysql_exports             } \
                   $imp_libs
 
 lib{mysqlclient}: mysys/cxx{posix_timers}:  include = $linux
@@ -47,6 +46,8 @@ lib{mysqlclient}: mysys/cxx{kqueue_timers}: include = ($bsd || $macos)
 lib{mysqlclient}:     mysys/{    cxx}{$mysys_win32}                     \
                         vio/{    cxx}{$vio_win32  }                     \
 libmysql/authentication_win/{hxx cxx}{*           }: include = $windows
+
+libs{mysqlclient}: def{libmysql_exports}: include = $windows
 
 # Makes sense to distribute READMEs for the bundled libraries. Note that their
 # licenses are incorporated into the root LICENSE file.

@@ -1,0 +1,1 @@
+../../../upstream/sql-common/client_authentication.cc

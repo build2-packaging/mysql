@@ -3,11 +3,11 @@ name: libmysqlclient
 
 # Note: remember to update doc-url below!
 #
-version: 8.0.15+9
+version: 8.0.15+10
 
 project: mysql
 summary: MySQL C API client library
-license: GPLv2 with Universal FOSS Exception
+license: other: GPL-2.0-only with MySQL Universal FOSS Exception
 topics: C, MySQL, SQL, relational database
 description-file: README
 url: https://www.mysql.com

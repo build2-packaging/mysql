@@ -1,23 +1,5 @@
 On the revision:
 
-- Make the .def file a prerequisite of the libs type target and only for
-  Windows.
-
-- Canonicalize the license in the package manifest.
-
-- Normalize C comments in the tests source code:
-
-  Replace
-
-  /*
-   * ...
-   */
-
-  with
-
-  /* ...
-   */
-
 On the release:
 
 - Use legal{} target type for legal documentation (LICENSE, AUTHORS, etc).
