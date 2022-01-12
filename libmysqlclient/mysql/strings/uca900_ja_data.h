@@ -1,0 +1,1 @@
+../../../upstream/strings/uca900_ja_data.h

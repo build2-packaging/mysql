@@ -6,11 +6,29 @@ Symlink the required upstream components and provide our own implementations
 for auto-generated headers:
 
 $ ln -s ../upstream/LICENSE
-
-$ ln -s ../../upstream/{strings,vio,sql-common,sql,mysys,mysys_ssl,libbinlogevents,libmysql} \
-  mysql
-
+$ ln -s ../../upstream/{vio,sql,mysys,mysys_ssl,libbinlogevents,libmysql} mysql
 $ ln -s ../../upstream/include mysql/mysql
+
+Also make sure all source files are UTF-8-encoded:
+
+$ mkdir -p mysql/strings
+$ pushd mysql/strings
+$ ln -s ../../../upstream/strings/{README,*.{cc,h}} .
+$ mv ctype-czech.cc ctype-czech.cc.orig
+$ iconv -f ISO-8859-2 -t UTF-8 ctype-czech.cc.orig >ctype-czech.cc
+$ mv decimal.cc decimal.cc.orig
+$ iconv -f UTF-8 -t UTF-8 -c decimal.cc.orig >decimal.cc
+$ popd
+
+Also add missing <limits> include to sql-common/sql_string.cc:
+
+$ mkdir -p mysql/sql-common
+$ pushd mysql/sql-common
+$ ln -s ../../../upstream/sql-common/*.{cc,h} .
+$ mv sql_string.cc sql_string.cc.orig
+$ cp sql_string.cc.orig sql_string.cc
+# Edit sql_string.cc, adding missing <limits> include.
+$ popd
 
 Note that we unable to generate mysql_version.h directly from the template as
 it is included as "mysql_version.h" in upstream's source code, which makes

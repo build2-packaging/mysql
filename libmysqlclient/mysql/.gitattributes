@@ -1,0 +1,7 @@
+libbinlogevents symlink=dir
+libmysql        symlink=dir
+mysql           symlink=dir
+mysys           symlink=dir
+mysys_ssl       symlink=dir
+sql             symlink=dir
+vio             symlink=dir
