@@ -117,6 +117,18 @@
 #undef HAVE_ULONG
 
 /*
+ * GNU libc added strlcpy() and strlcat() in version 2.38 (in anticipation
+ * of their addition to POSIX).
+ */
+#if defined(__FreeBSD__) || \
+    defined(__APPLE__)   || \
+    (defined(__GLIBC__)       && \
+     defined(__GLIBC_MINOR__) && \
+     (__GLIBC__  > 2 || __GLIBC__ == 2 && __GLIBC_MINOR__ >= 38))
+#  define HAVE_STRLCAT 1
+#endif
+
+/*
  * Specific for Linux.
  */
 #ifdef __linux__
@@ -181,7 +193,6 @@
 #  define HAVE_KQUEUE_TIMERS         1
 #  define HAVE_SOCKADDR_IN_SIN_LEN   1
 #  define HAVE_SOCKADDR_IN6_SIN6_LEN 1
-#  define HAVE_STRLCAT               1
 #endif
 
 /*
