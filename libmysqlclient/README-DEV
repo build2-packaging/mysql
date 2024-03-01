@@ -8,6 +8,7 @@ for auto-generated headers:
 $ ln -s ../upstream/LICENSE
 $ ln -s ../../upstream/{vio,sql,mysys,mysys_ssl,libbinlogevents,libmysql} mysql
 $ ln -s ../../upstream/include mysql/mysql
+$ ln -s mysql/mysql_version.h.in mysql/version.h.in
 
 Also make sure all source files are UTF-8-encoded:
 
@@ -34,7 +35,7 @@ Note that we unable to generate mysql_version.h directly from the template as
 it is included as "mysql_version.h" in upstream's source code, which makes
 impossible using the header-generating machinery. That's why we create
 mysql/mysql_version.h that includes <mysql/version.h> that we auto-generate
-from upstream's mysql/mysql_version.h.in.
+from upstream's mysql_version.h.in.
 
 $ ln -s libbinlogevents/binlog_config.h.cmake mysql/binlog_config.h.cmake.orig
 
@@ -65,7 +66,8 @@ to, grepping for its usages, for example:
 
 grep -e CPU_LEVEL1_DCACHE_LINESIZE `find -L . -name '*.c*' -o -name '*.h*'`
 
-And it may become obvious that the macro is not used in libmysqlclient.
+And it may become obvious that the macro is not used in libmysqlclient and
+mysql-client.
 
 Re-creating mysql/my_config.h from scratch every time we upgrade to a new
 upstream version would be a real pain. Instead we can only (un)define the
@@ -74,7 +76,7 @@ macro sets:
 
 $ for m in `cat mysql/{config,binlog_config}.h.cmake.orig | \
             sed -n 's/.*#\s*\(define\|cmakedefine\)\s\{1,\}\([_a-zA-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' | sort -u`; do
-    if grep -q -e "\b$m\b" `find -L . -name '*.h' -a ! -name my_config.h -a ! -name config.h -o -name '*.c' -o -name '*.cc' -a ! -name mysqld.cc -o -name '*.cpp' -o -name '*.hpp'`; then
+    if grep -q -e "\b$m\b" `find -L . ../mysql-client -name '*.h' -a ! -name my_config.h -a ! -name config.h -o -name '*.c' -o -name '*.cc' -a ! -name mysqld.cc -o -name '*.cpp' -o -name '*.hpp'`; then
       echo "$m"
     fi
   done >used-macros

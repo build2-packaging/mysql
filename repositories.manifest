@@ -8,3 +8,7 @@ location: ../../openssl/openssl.git##HEAD
 :
 role: prerequisite
 location: ../../zlib/zlib.git##HEAD
+
+:
+role: prerequisite
+location: https://github.com/build2-packaging/isocline.git##HEAD

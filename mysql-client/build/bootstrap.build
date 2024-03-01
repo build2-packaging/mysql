@@ -1,0 +1,10 @@
+# file      : build/bootstrap.build
+# license   : GPLv2 with Universal FOSS Exception; see accompanying LICENSE file
+
+project = mysql-client
+
+using version
+using config
+using dist
+using test
+using install

@@ -1,0 +1,2 @@
+include         symlink=dir
+libbinlogevents symlink=dir

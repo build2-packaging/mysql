@@ -17,14 +17,15 @@
  */
 
 /*
- * Auto-generated. Defines the following configuration macros:
+ * Includes auto-generated version.h. Defines the following configuration
+ * macros:
 
 #define PROTOCOL_VERSION
 
   * Keep all the macros listed (in this exact form) for the change tracking
   * (see README-DEV).
   */
-#include <mysql/version.h> // PROTOCOL_VERSION, MYSQL_SERVER_VERSION
+#include <mysql/mysql_version.h> // PROTOCOL_VERSION, MYSQL_SERVER_VERSION
 
 /*
  * Auto-generated. Defines macros that depend on the version and build2
@@ -108,12 +109,9 @@
 #  define SIZEOF_CHARP     SIZEOF_VOIDP
 #endif
 
-#define HAVE_STRUCT_TIMESPEC
-
 /*
  * Hard to even find any records of these types.
  */
-#undef HAVE_UINT
 #undef HAVE_ULONG
 
 /*
@@ -180,7 +178,6 @@
 #if defined(__FreeBSD__) || defined(__linux__)
 #  define HAVE_CLOCK_GETTIME   1
 #  define HAVE_CUSERID         1
-#  define HAVE_SIGEV_THREAD_ID 1
 #  define HAVE_POSIX_FALLOCATE 1
 #endif
 
@@ -221,8 +218,6 @@
 #  define HAVE_GETPWUID             1
 #  define HAVE_GETRLIMIT            1
 #  define HAVE_GETRUSAGE            1
-#  define HAVE_READLINK             1
-#  define HAVE_REALPATH             1
 #  define HAVE_STPCPY               1
 #  define HAVE_STPNCPY              1
 #  define HAVE_NL_LANGINFO          1
@@ -234,7 +229,6 @@
 #  define TIME_WITH_SYS_TIME        1
 #  define HAVE_ARPA_INET_H          1
 #  define HAVE_NETINET_IN_H         1
-#  define HAVE_CHOWN                1
 #  define HAVE_FCHMOD               1
 #  define HAVE_MLOCKALL             1
 #  define HAVE_SYS_WAIT_H           1
@@ -258,6 +252,18 @@
 #  define HAVE_BUILTIN_STPCPY      1
 
 /*
+ * Libedit.
+ */
+#  define USE_LIBEDIT_INTERFACE      1
+#  define USE_NEW_EDITLINE_INTERFACE 1
+#  define HAVE_HIST_ENTRY            1
+#  undef  HAVE_TERM_H
+
+#  define GWINSZ_IN_SYS_IOCTL 1
+#  define HAVE_INDEX          1
+#  define HAVE_INITGROUPS     1
+
+/*
  * Specific for Windows.
  */
 #else
@@ -265,6 +271,7 @@
 #  define HAVE_TELL                      1
 #  define NO_FCNTL_NONBLOCK              1
 #  define DEFAULT_TMPDIR                 ""
+#  define FN_NO_CASE_SENSE               1
 #endif
 
 #ifdef _WIN32
@@ -278,10 +285,11 @@
 /*
  * Common for all supported OSes/compilers.
  */
-#define HAVE_STRNLEN     1
-#define MAX_INDEXES      64U
-#define HAVE_SYS_TYPES_H 1
-#define STACK_DIRECTION  -1
+#define MAX_INDEXES                  64U
+#define HAVE_SYS_TYPES_H             1
+#define STACK_DIRECTION              -1
+#define CPU_LEVEL1_DCACHE_LINESIZE   64
+#define DEFAULT_SECURE_FILE_PRIV_DIR "NULL"
 
 /*
  * Default character set and collation.
@@ -318,8 +326,8 @@
 #undef HAVE_PRINTSTACK
 #undef HAVE_GETHRTIME
 #undef HAVE_GETPASSPHRASE
-#undef HAVE_SIGEV_PORT
 #undef HAVE_SOLARIS_ATOMIC
+#undef LINUX_ALPINE
 
 /*
  * The upstream package undefines it for all supported compilers.

@@ -1,0 +1,15 @@
+# file      : tests/build/root.build
+# license   : GPLv2 with Universal FOSS Exception; see accompanying LICENSE file
+
+# We need to configure C module to obtain the target information (see below).
+#
+using c.config
+
+# Setup the mysql program that we are testing.
+#
+import mysql = mysql-client%exe{mysql}
+testscript{*}: test = $mysql
+
+# Specify the test target for cross-testing.
+#
+test.target = $c.target

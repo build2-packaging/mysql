@@ -67,7 +67,7 @@ lib{mysqlclient}: strings/file{README}
 #    Fedora/RHEL:    /var/lib/mysql/mysql.sock
 #    Source package: /tmp/mysql.sock
 #
-h{version}: mysql/in{mysql_version} $src_root/manifest
+h{version}: in{version} $src_root/manifest
 {
   dist  = true
   clean = ($src_root != $out_root)

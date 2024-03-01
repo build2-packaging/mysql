@@ -1,0 +1,92 @@
+# file      : mysql/buildfile
+# license   : GPLv2 with Universal FOSS Exception; see accompanying LICENSE file
+
+tclass = $c.target.class
+
+windows = ($tclass == 'windows')
+
+# Note that the mysql utility source code directly refers to the
+# libmysqlclient's implementations details quite a lot. Thus, we just use the
+# libmysqlclient static library in combination with the private headers. Also
+# note that the upstream's mysql utility doesn't link the shared
+# libmysqlclient either.
+#
+import libs = libmysqlclient%liba{mysqlclient}
+
+# Note that the mysql utility doesn't use openssl directly. We however import
+# libcrypto so that the included by some common headers <openssl/opensslv.h>
+# can be found.
+#
+import libs += libcrypto%lib{crypto}
+
+if! $windows
+  import libs += libisocline%liba{isocline}
+
+# Note that some of the include/**.h files are C++ headers and some are C
+# headers. We will assume all of them as C headers, which is a bit of a hack
+# but doing it properly is too painful.
+#
+exe{mysql}:     {h c        }{*           } \
+         client/{    hxx cxx}{*           } \
+     downstream/{h c        }{*  -readline} \
+        include/{h          }{**          } \
+libbinlogevents/{h          }{**          }
+
+exe{mysql}: downstream/{h c}{readline}: include = (!$windows)
+
+exe{mysql}: $libs
+
+# Build options.
+#
+# We have dropped the macro definitions that are not used in the package code:
+#
+#   -DRAPIDJSON_NO_SIZETYPEDEFINE
+#   -DUNISTR_FROM_CHAR_EXPLICIT=explicit
+#   -DUNISTR_FROM_STRING_EXPLICIT=explicit
+#   -DHAVE_LIBEVENT2
+#   -DNO_FSEEKO
+#
+cc.poptions += -DHAVE_CONFIG_H        \
+               -DHAVE_OPENSSL         \
+               -D__STDC_LIMIT_MACROS  \
+               -D__STDC_FORMAT_MACROS \
+               -D_USE_MATH_DEFINES    \
+               -DDBUG_OFF
+
+switch $tclass
+{
+  case 'windows'
+    cc.poptions += -DWIN32 -D_WINDOWS -D_WIN32_WINNT=0x0601 -DNOGDI \
+                   -DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_MBCS
+
+  case 'linux'
+    cc.poptions += -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
+
+  default
+    cc.poptions += -D_FILE_OFFSET_BITS=64
+}
+
+# Note that we add "-I$src_root" for the headers auto-generating machinery to
+# work properly.
+#
+cc.poptions =+ "-I$out_root" "-I$src_root"          \
+               "-I$src_base/downstream"             \
+               "-I$src_base/include"                \
+               "-I$src_base/libbinlogevents/export" \
+               "-I$src_base"
+
+switch $c.class
+{
+  case 'gcc'
+  {
+    cc.coptions += -ffunction-sections -fdata-sections -fno-omit-frame-pointer
+  }
+  case 'msvc'
+  {
+    cc.coptions += /GS /fp:precise /Zc:wchar_t /Zc:forScope
+
+    # Disable warnings that pop up with /W3.
+    #
+    cc.coptions += /wd4996
+  }
+}

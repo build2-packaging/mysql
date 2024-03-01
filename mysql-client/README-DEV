@@ -1,0 +1,15 @@
+This document describes how the mysql utility was packaged for build2. In
+particular, this understanding will be useful when upgrading to a new upstream
+version. See ../README-DEV for general notes on MySQL packaging.
+
+Symlink the required upstream components:
+
+$ ln -s ../upstream/LICENSE
+
+$ mkdir -p mysql/{client,downstream}
+$ ln -s ../../../upstream/client/{{mysql,readline,completion_hash,pattern_matcher}.cc,{client_priv,my_readline,pattern_matcher,completion_hash}.h} mysql/client
+$ ln -s ../../libmysqlclient/mysql/{my_config,mysqld_error}.h mysql/
+$ ln -s ../../upstream/{include,libbinlogevents} mysql/
+
+Create mysql/downstream/mysql_version.h, so it can be found when included as
+"mysql_version.h" (which, for example, mysql.h does).

@@ -1,0 +1,12 @@
+# file      : tests/help.testscript
+# license   : GPLv2 with Universal FOSS Exception; see accompanying LICENSE file
+
+: basics
+:
+: Test that stdout contains at least one non-empty line.
+:
+$* --help >>~%EOO%
+  %.*
+  %.+%
+  %.*
+  EOO
