@@ -3,7 +3,7 @@ name: libmysqlclient
 
 # Note: remember to update doc-url below!
 #
-version: 8.0.15+13
+version: 8.0.15+14
 
 project: mysql
 summary: MySQL C API client library
@@ -30,3 +30,5 @@ depends: libssl ^1.1.1
 # System package mapping.
 #
 fedora-name: community-mysql-devel
+rhel-name:   mysql-devel
+centos-name: mysql-devel

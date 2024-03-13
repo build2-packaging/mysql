@@ -41,10 +41,15 @@ packaged as follows:
 
                 src              library               headers                client
 Debian/Ubuntu:  mysql-8.0        libmysqlclient21      libmysqlclient-dev     mysql-client-core-8.0
-Fedora/RHEL:    community-mysql  community-mysql-libs  community-mysql-devel  community-mysql
+Fedora:         community-mysql  community-mysql-libs  community-mysql-devel  community-mysql
+RHEL            mysql            mysql-libs            mysql-devel            mysql
 
-Search for the Debian and Fedora packages at https://packages.debian.org/search
-and https://apps.fedoraproject.org/packages/.
+Search for the Debian, Fedora, and RedHat packages at
+https://packages.debian.org/search,
+https://apps.fedoraproject.org/packages/, and
+https://access.redhat.com/downloads/content/package-browser (or per
+repository at
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html-single/package_manifest/).
 
 Instead of using MySQL 5.7.26 Debian's rules for MySQL 8.0.15 we are
 packaging, let's use upstream/packaging/deb-in/rules.in. That's not ideal but

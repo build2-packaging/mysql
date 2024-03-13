@@ -3,7 +3,7 @@ name: mysql-client
 
 # Note: remember to update doc-url and debian-name below!
 #
-version: 8.0.15+13
+version: 8.0.15+14
 
 project: mysql
 summary: MySQL command-line client
@@ -31,3 +31,5 @@ depends: libisocline >= 1.0.9 ? ($c.target.class != 'windows')
 #
 debian-name: mysql-client-core-8.0
 fedora-name: community-mysql
+rhel-name:   mysql
+centos-name: mysql
