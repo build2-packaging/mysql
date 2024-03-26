@@ -3,7 +3,7 @@ name: libmysqlclient
 
 # Note: remember to update doc-url below!
 #
-version: 8.0.15+14
+version: 8.0.15+15
 
 project: mysql
 summary: MySQL C API client library

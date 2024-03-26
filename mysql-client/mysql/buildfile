@@ -15,9 +15,10 @@ import libs = libmysqlclient%liba{mysqlclient}
 
 # Note that the mysql utility doesn't use openssl directly. We however import
 # libcrypto so that the included by some common headers <openssl/opensslv.h>
-# can be found.
+# can be found. Also note that we link it statically to be consistent with
+# libssl.a, linked implicitly via libmysqlclient.a.
 #
-import libs += libcrypto%lib{crypto}
+import libs += libcrypto%liba{crypto}
 
 if! $windows
   import libs += libisocline%liba{isocline}
