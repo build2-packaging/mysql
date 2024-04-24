@@ -1,0 +1,6 @@
+: 1
+name: mysql-client
+version: 8.0.15+16
+project: mysql
+summary: MySQL command-line client
+license: other: GPL-2.0-only with MySQL Universal FOSS Exception
