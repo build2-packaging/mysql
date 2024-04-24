@@ -3,7 +3,7 @@ name: mysql-client
 
 # Note: remember to update doc-url and debian-name below!
 #
-version: 8.0.15+15
+version: 8.0.15+16
 
 project: mysql
 summary: MySQL command-line client
@@ -19,8 +19,6 @@ package-email: packaging@build2.org ; Mailing list.
 build-error-email: builds@build2.org
 builds: all
 builds: -wasm
-builds: -( +windows &gcc ) ; MinGW GCC is not supported.
-builds: -static            ; Implementation uses C++ and requires special linking steps.
 depends: * build2 >= 0.15.0
 depends: * bpkg >= 0.15.0
 depends: libmysqlclient == $

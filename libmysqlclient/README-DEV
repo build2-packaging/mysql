@@ -6,9 +6,45 @@ Symlink the required upstream components and provide our own implementations
 for auto-generated headers:
 
 $ ln -s ../upstream/LICENSE
-$ ln -s ../../upstream/{vio,sql,mysys,mysys_ssl,libbinlogevents,libmysql} mysql
-$ ln -s ../../upstream/include mysql/mysql
-$ ln -s mysql/mysql_version.h.in mysql/version.h.in
+#$ ln -s ../../upstream/{vio,sql,mysys,mysys_ssl,libbinlogevents,libmysql} mysql
+$ ln -s ../../upstream/{vio,sql,mysys_ssl,libbinlogevents,libmysql} mysql
+#$ ln -s ../../upstream/include mysql/mysql
+$ ln -s ../../upstream/include/mysql_version.h.in mysql/version.h.in
+
+Add support for building with MinGW GCC:
+
+$ mkdir -p mysql/mysql
+$ pushd mysql/mysql
+$ ln -s ../../../upstream/include/*.h .
+$ mv m_ctype.h m_ctype.h.orig
+$ cp m_ctype.h.orig m_ctype.h
+$ mv my_dir.h my_dir.h.orig
+$ cp my_dir.h.orig my_dir.h
+$ mkdir -p mysql/components/services
+$ cd mysql/components/services
+$ ln -s ../../../../../../upstream/include/mysql/components/services/*.h .
+$ mv my_io_bits.h my_io_bits.h.orig
+$ cp my_io_bits.h.orig my_io_bits.h
+$ cd ..
+$ ln -s ../../../../../upstream/include/mysql/components/*.h .
+$ cd ..
+$ ln -s ../../../../upstream/include/mysql/psi .
+$ ln -s ../../../../upstream/include/mysql/*.h .
+$ popd
+$ mkdir -p mysql/mysys
+$ pushd mysql/mysys
+$ ln -s ../../../upstream/mysys/*.{h,cc} .
+$ mv my_thr_init.cc my_thr_init.cc.orig
+$ cp my_thr_init.cc.orig my_thr_init.cc
+$ mv stacktrace.cc stacktrace.cc.orig
+$ cp stacktrace.cc.orig stacktrace.cc
+$ popd
+
+$ git apply mingw.patch
+
+Note that the above patches are produced by the following commands:
+
+$ git diff ><patch-path>
 
 Also make sure all source files are UTF-8-encoded:
 

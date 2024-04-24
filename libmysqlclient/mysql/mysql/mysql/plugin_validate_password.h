@@ -1,0 +1,1 @@
+../../../../upstream/include/mysql/plugin_validate_password.h

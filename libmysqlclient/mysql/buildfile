@@ -216,10 +216,10 @@ switch $c.class
 switch $tclass, $tsys
 {
   case 'windows', 'mingw32'
-    cc.libs += -ladvapi32
+    cc.libs += -lws2_32 -ldbghelp -lsecur32 -ladvapi32
 
   case 'windows'
-    cc.libs += advapi32.lib
+    cc.libs += advapi32.lib # Note: rest linked via pragmas.
 
   case 'linux'
   {

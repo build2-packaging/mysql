@@ -1,0 +1,94 @@
+diff --git a/libmysqlclient/mysql/mysql/m_ctype.h b/libmysqlclient/mysql/mysql/m_ctype.h
+index d59bb12..a0afe7a 100644
+--- a/libmysqlclient/mysql/mysql/m_ctype.h
++++ b/libmysqlclient/mysql/mysql/m_ctype.h
+@@ -235,7 +235,7 @@ typedef struct MY_COLLATION_HANDLER {
+                  const char *wildstr, const char *wildend, int escape,
+                  int w_one, int w_many);
+ 
+-  int (*strcasecmp)(const CHARSET_INFO *, const char *, const char *);
++  int (*strcasecmp_)(const CHARSET_INFO *, const char *, const char *);
+ 
+   uint (*strstr)(const CHARSET_INFO *, const char *b, size_t b_length,
+                  const char *s, size_t s_length, my_match_t *match,
+@@ -681,7 +681,7 @@ values < 0x7F. */
+   ((s)->coll->like_range((s), (a), (b), (c), (d), (e), (f), (g), (h), (i), (j)))
+ #define my_wildcmp(cs, s, se, w, we, e, o, m) \
+   ((cs)->coll->wildcmp((cs), (s), (se), (w), (we), (e), (o), (m)))
+-#define my_strcasecmp(s, a, b) ((s)->coll->strcasecmp((s), (a), (b)))
++#define my_strcasecmp(s, a, b) ((s)->coll->strcasecmp_((s), (a), (b)))
+ #define my_charpos(cs, b, e, num) \
+   (cs)->cset->charpos((cs), (const char *)(b), (const char *)(e), (num))
+ 
+diff --git a/libmysqlclient/mysql/mysql/my_dir.h b/libmysqlclient/mysql/mysql/my_dir.h
+index c179ad8..c4656b7 100644
+--- a/libmysqlclient/mysql/mysql/my_dir.h
++++ b/libmysqlclient/mysql/mysql/my_dir.h
+@@ -36,9 +36,11 @@
+ /* Defines for my_dir and my_stat */
+ 
+ #ifdef _WIN32
++#ifndef __MINGW32__
+ #define S_IROTH _S_IREAD
+ #define S_IFIFO _S_IFIFO
+ #endif
++#endif
+ 
+ #define MY_S_IFMT S_IFMT     /* type of file */
+ #define MY_S_IFDIR S_IFDIR   /* directory */
+diff --git a/libmysqlclient/mysql/mysql/mysql/components/services/my_io_bits.h b/libmysqlclient/mysql/mysql/mysql/components/services/my_io_bits.h
+index f561189..270d859 100644
+--- a/libmysqlclient/mysql/mysql/mysql/components/services/my_io_bits.h
++++ b/libmysqlclient/mysql/mysql/mysql/components/services/my_io_bits.h
+@@ -49,8 +49,12 @@
+ 
+ typedef int File; /* File descriptor */
+ #ifdef _WIN32
++#ifdef __MINGW32__
++typedef mode_t MY_MODE;
++#else
+ typedef int MY_MODE;
+ typedef int mode_t;
++#endif
+ typedef int socket_len_t;
+ typedef SOCKET my_socket;
+ #else
+diff --git a/libmysqlclient/mysql/mysys/my_thr_init.cc b/libmysqlclient/mysql/mysys/my_thr_init.cc
+index b041de3..ba10464 100644
+--- a/libmysqlclient/mysql/mysys/my_thr_init.cc
++++ b/libmysqlclient/mysql/mysys/my_thr_init.cc
+@@ -373,7 +373,13 @@ static void my_sigabrt_handler(int sig) { __debugbreak(); }
+ 
+ static void install_sigabrt_handler() {
+   /*abort() should not override our exception filter*/
++
++  // Requires msvcrt90 or later but forcing this in a library is
++  // probably not a good idea.
++  //
++#ifndef __MINGW32__
+   _set_abort_behavior(0, _CALL_REPORTFAULT);
++#endif
+   signal(SIGABRT, my_sigabrt_handler);
+ }
+ #endif
+diff --git a/libmysqlclient/mysql/mysys/stacktrace.cc b/libmysqlclient/mysql/mysys/stacktrace.cc
+index c941bf7..9f7e443 100644
+--- a/libmysqlclient/mysql/mysys/stacktrace.cc
++++ b/libmysqlclient/mysql/mysys/stacktrace.cc
+@@ -536,12 +536,16 @@ void my_create_minidump(const char *name, HANDLE process, DWORD pid) {
+ }
+ 
+ void my_safe_puts_stderr(const char *val, size_t len) {
++#ifndef __MINGW32__
+   __try {
++#endif
+     my_write_stderr(val, len);
+     my_safe_printf_stderr("%s", "\n");
++#ifndef __MINGW32__
+   } __except (EXCEPTION_EXECUTE_HANDLER) {
+     my_safe_printf_stderr("%s", "is an invalid string pointer\n");
+   }
++#endif
+ }
+ #endif /* _WIN32 */
+ 

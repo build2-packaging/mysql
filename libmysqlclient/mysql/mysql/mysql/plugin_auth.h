@@ -1,0 +1,1 @@
+../../../../upstream/include/mysql/plugin_auth.h
