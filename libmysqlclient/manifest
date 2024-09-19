@@ -3,7 +3,7 @@ name: libmysqlclient
 
 # Note: remember to update doc-url below!
 #
-version: 8.0.15+16
+version: 8.0.15+17
 
 project: mysql
 summary: MySQL C API client library
@@ -27,7 +27,18 @@ depends: libcrypto ^1.1.1
 depends: libssl ^1.1.1
 
 # System package mapping.
+
+# Note that versioning of the default-libmysqlclient-dev meta-package differs
+# from that of the underlying implementation package, which may actually be
+# the MariaDB client library. Thus, we map the distribution package version to
+# the minimum possible bpkg version of the package.
 #
-fedora-name: community-mysql-devel
-rhel-name:   mysql-devel
-centos-name: mysql-devel
+# Also note that the unstable distribution contains the MySQL-based
+# libmysqlclient-dev package, which we may potentially use for the future
+# Debian versions.
+#
+debian-name: default-libmysqlclient-dev
+debian-to-downstream-version: /.*/8.0.0/
+
+fedora-name:    mysql-devel
+fedora_39-name: community-mysql-devel

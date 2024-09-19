@@ -3,7 +3,7 @@ name: mysql-client
 
 # Note: remember to update doc-url and debian-name below!
 #
-version: 8.0.15+16
+version: 8.0.15+17
 
 project: mysql
 summary: MySQL command-line client
@@ -26,8 +26,11 @@ depends: libcrypto ^1.1.1
 depends: libisocline >= 1.0.9 ? ($c.target.class != 'windows')
 
 # System package mapping.
+
+# See libmysqlclient's manifest for the mapping considerations.
 #
-debian-name: mysql-client-core-8.0
-fedora-name: community-mysql
-rhel-name:   mysql
-centos-name: mysql
+debian-name: default-mysql-client-core
+debian-to-downstream-version: /.*/8.0.0/
+
+fedora-name:    mysql
+fedora_39-name: community-mysql
