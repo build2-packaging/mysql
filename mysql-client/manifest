@@ -3,7 +3,7 @@ name: mysql-client
 
 # Note: remember to update doc-url and debian-name below!
 #
-version: 8.0.15+17
+version: 8.0.15+18
 
 project: mysql
 summary: MySQL command-line client
@@ -17,7 +17,7 @@ package-url: https://git.build2.org/cgit/packaging/mysql/
 email: mysql@lists.mysql.com        ; Mailing list.
 package-email: packaging@build2.org ; Mailing list.
 build-error-email: builds@build2.org
-builds: all
+builds: all relocatable
 builds: -wasm
 depends: * build2 >= 0.15.0
 depends: * bpkg >= 0.15.0

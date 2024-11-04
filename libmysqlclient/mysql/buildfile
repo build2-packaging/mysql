@@ -103,19 +103,27 @@ h{config}: in{config}
   MACHINE_TYPE = $c.target.cpu
   SYSTEM_TYPE  = $tsys
 
-  DEFAULT_BASEDIR = ($install.root != [null]                             \
+  # These directories are used as a last resort where MySQL tries to find its
+  # files.
+  #
+  # Note that the upstream package doesn't support dynamic resolution of
+  # relative DEFAULT_BASEDIR, PLUGINDIR, and SHAREDIR at runtime (against the
+  # library path or some such). Thus, for the relocatable installation we
+  # proceed in the same way as if install.root is [null].
+  #
+  DEFAULT_BASEDIR = ($install.root != [null] && !$install.relocatable    \
                      ? $regex.replace("$install.resolve($install.root)", \
                                       '\\',                              \
                                       '/')                               \
                      : '')
 
-  PLUGINDIR = ($install.root != [null]                                       \
+  PLUGINDIR = ($install.root != [null] && !$install.relocatable              \
                ? $regex.replace($install.resolve($install.lib)/mysql/plugin, \
                                 '\\',                                        \
                                 '/')                                         \
                : '')
 
-  SHAREDIR = ($install.root != [null]                                            \
+  SHAREDIR = ($install.root != [null] && !$install.relocatable                   \
               ? $regex.replace($install.resolve($install.data_root)/share/mysql, \
                                '\\',                                             \
                                '/')                                              \
